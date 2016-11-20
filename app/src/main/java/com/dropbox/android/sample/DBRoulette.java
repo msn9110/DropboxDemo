@@ -47,6 +47,7 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.dropbox.client2.DropboxAPI;
@@ -90,8 +91,10 @@ public class DBRoulette extends Activity {
     private LinearLayout mDisplay;
     private Button mPhoto;
     private Button mRoulette;
+    private Button mShow;
 
     private ImageView mImage;
+    private ListView mList;
 
     private final String PHOTO_DIR = "/Photos/";
 
@@ -178,6 +181,15 @@ public class DBRoulette extends Activity {
             public void onClick(View v) {
                 DownloadRandomPicture download = new DownloadRandomPicture(DBRoulette.this, mApi, PHOTO_DIR, mImage);
                 download.execute();
+            }
+        });
+
+        mShow=(Button)findViewById(R.id.list_button);
+        mList=(ListView)findViewById(R.id.listView);
+        mShow.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
             }
         });
 

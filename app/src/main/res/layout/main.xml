@@ -23,6 +23,13 @@
             android:layout_height="fill_parent"
             android:layout_weight="1"
             />
+
+        <ListView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/listView"
+            android:layout_weight="1" />
+
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="fill_parent"
@@ -30,7 +37,14 @@
             >
             <Button
                 android:id="@+id/roulette_button"
-                android:text="Roulette"
+                android:text="Download"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                />
+            <Button
+                android:id="@+id/list_button"
+                android:text="List"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
