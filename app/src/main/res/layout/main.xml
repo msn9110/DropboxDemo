@@ -8,7 +8,8 @@
         android:id="@+id/auth_button"
         android:text="Link with Dropbox"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="fill_parent"
+        android:layout_weight="8"
         />
     <LinearLayout
         android:id="@+id/logged_in_display"
@@ -26,34 +27,35 @@
 
         <ListView
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="fill_parent"
             android:id="@+id/listView"
             android:layout_weight="1" />
 
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="fill_parent"
+            android:layout_weight="1.5"
             >
             <Button
                 android:id="@+id/roulette_button"
                 android:text="Download"
                 android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="fill_parent"
                 android:layout_weight="1"
                 />
             <Button
                 android:id="@+id/list_button"
                 android:text="List"
                 android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="fill_parent"
                 android:layout_weight="1"
                 />
             <Button
                 android:id="@+id/photo_button"
                 android:text="New Photo"
                 android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="fill_parent"
                 android:layout_weight="1"
                 />
         </LinearLayout>

@@ -41,6 +41,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -55,6 +56,9 @@ import com.dropbox.client2.android.AndroidAuthSession;
 import com.dropbox.client2.android.AuthActivity;
 import com.dropbox.client2.session.AccessTokenPair;
 import com.dropbox.client2.session.AppKeyPair;
+
+import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
+import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
 
 public class DBRoulette extends Activity {
@@ -81,6 +85,7 @@ public class DBRoulette extends Activity {
     private static final String ACCESS_SECRET_NAME = "ACCESS_SECRET";
 
     private static final boolean USE_OAUTH1 = false;
+    private static final int REQUEST_EXTERNAL_STORAGE = 0;
 
     DropboxAPI<AndroidAuthSession> mApi;
 
@@ -107,6 +112,19 @@ public class DBRoulette extends Activity {
 
         if (savedInstanceState != null) {
             mCameraFileName = savedInstanceState.getString("mCameraFileName");
+        }
+
+        int permission = ActivityCompat.checkSelfPermission(this, WRITE_EXTERNAL_STORAGE);
+        if (permission != PackageManager.PERMISSION_GRANTED) {
+            // 無權限，向使用者請求
+            ActivityCompat.requestPermissions(
+                    this,
+                    new String[] {WRITE_EXTERNAL_STORAGE, READ_EXTERNAL_STORAGE},
+                    REQUEST_EXTERNAL_STORAGE
+            );
+        }else{
+            //已有權限，執行儲存程式
+
         }
 
         // We create a new AuthSession so that we can use the Dropbox API.
@@ -369,5 +387,19 @@ public class DBRoulette extends Activity {
         AndroidAuthSession session = new AndroidAuthSession(appKeyPair);
         loadAuth(session);
         return session;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch(requestCode) {
+            case REQUEST_EXTERNAL_STORAGE:
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    //取得權限，進行檔案存取
+                } else {
+                    //使用者拒絕權限，停用檔案存取功能
+                    this.finish();
+                }
+        }
     }
 }
