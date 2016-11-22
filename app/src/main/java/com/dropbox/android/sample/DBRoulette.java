@@ -45,11 +45,13 @@ import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.dropbox.client2.DropboxAPI;
@@ -215,6 +217,13 @@ public class DBRoulette extends Activity {
         String[] test=new String[]{"TEST"};
         ArrayAdapter<String> AD =new ArrayAdapter<>(this,android.R.layout.simple_list_item_1,test);
         mList.setAdapter(AD);
+        mList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                String select=((TextView) view).getText().toString();
+                System.out.println(select);
+            }
+        });
         // Display the proper UI state if logged in or not
         setLoggedIn(mApi.getSession().isLinked());
 

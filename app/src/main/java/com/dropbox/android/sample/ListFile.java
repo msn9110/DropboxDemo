@@ -33,26 +33,19 @@ import com.dropbox.client2.exception.DropboxUnlinkedException;
  * control for an app that downloads a file from Dropbox.
  */
 
-public class ListFile extends AsyncTask<Void, Long, Boolean> {
+public class ListFile extends AsyncTask<Void, Void, Boolean> {
 
 
     private Context mContext;
-    private final ProgressDialog mDialog;
     private DropboxAPI<?> mApi;
     private String mPath;
     private ListView mView;
-    private Drawable mDrawable;
 
     private FileOutputStream mFos;
     private ArrayList<String> files;
 
-    private boolean mCanceled;
-    private Long mFileLen;
     private String mErrorMsg;
 
-    // Note that, since we use a single file name here for simplicity, you
-    // won't be able to use this code for two simultaneous downloads.
-    private final static String IMAGE_FILE_NAME = "dbroulette.png";
 
     public ListFile(Context context, DropboxAPI<?> api,
                                  String dropboxPath, ListView view) {
@@ -63,35 +56,11 @@ public class ListFile extends AsyncTask<Void, Long, Boolean> {
         mPath = dropboxPath;
         mView = view;
         files=new ArrayList<>();
-
-        mDialog = new ProgressDialog(context);
-        mDialog.setMessage("Get Data List");
-        mDialog.setButton(ProgressDialog.BUTTON_POSITIVE, "Cancel", new OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                mCanceled = true;
-                mErrorMsg = "Canceled";
-
-                // This will cancel the getThumbnail operation by closing
-                // its stream
-                if (mFos != null) {
-                    try {
-                        mFos.close();
-                    } catch (IOException e) {
-                    }
-                }
-            }
-        });
-
-        mDialog.show();
     }
 
     @Override
     protected Boolean doInBackground(Void... params) {
         try {
-            if (mCanceled) {
-                return false;
-            }
-
             // Get the metadata for a directory
             Entry dirent = mApi.metadata(mPath, 1000, null, true, null);
 
@@ -110,9 +79,6 @@ public class ListFile extends AsyncTask<Void, Long, Boolean> {
                 }
             }
 
-            if (mCanceled) {
-                return false;
-            }
 
             if (thumbs.size() == 0) {
                 // No thumbs in that directory
@@ -126,31 +92,7 @@ public class ListFile extends AsyncTask<Void, Long, Boolean> {
                 files.add(name);
             }
 //===============================================================================
-            // Now pick a random one
-            int index = (int) (Math.random() * thumbs.size());
-            Entry ent = thumbs.get(index);
-            String path = ent.path;
-            mFileLen = ent.bytes;
 
-
-            String cachePath = mContext.getCacheDir().getAbsolutePath() + "/" + IMAGE_FILE_NAME;
-            try {
-                mFos = new FileOutputStream(cachePath);
-            } catch (FileNotFoundException e) {
-                mErrorMsg = "Couldn't create a local file to store the image";
-                return false;
-            }
-
-            // This downloads a smaller, thumbnail version of the file.  The
-            // API to download the actual file is roughly the same.
-            mApi.getThumbnail(path, mFos, ThumbSize.BESTFIT_960x640,
-                    ThumbFormat.JPEG, null);
-            if (mCanceled) {
-                return false;
-            }
-
-            mDrawable = Drawable.createFromPath(cachePath);
-            // We must have a legitimate picture
             return true;
 
         } catch (DropboxUnlinkedException e) {
@@ -199,13 +141,13 @@ public class ListFile extends AsyncTask<Void, Long, Boolean> {
     }
 
     @Override
-    protected void onProgressUpdate(Long... progress) {
-
+    protected void onProgressUpdate(Void... progress) {
+        super.onProgressUpdate(progress);
     }
 
     @Override
     protected void onPostExecute(Boolean result) {
-        mDialog.dismiss();
+        super.onPostExecute(result);
         if (result) {
             System.out.println(files.size());
             for(String name:files)
