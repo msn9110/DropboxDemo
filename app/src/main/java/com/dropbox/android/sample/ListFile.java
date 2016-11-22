@@ -11,7 +11,9 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.dropbox.client2.DropboxAPI;
@@ -38,10 +40,11 @@ public class ListFile extends AsyncTask<Void, Long, Boolean> {
     private final ProgressDialog mDialog;
     private DropboxAPI<?> mApi;
     private String mPath;
-    private ImageView mView;
+    private ListView mView;
     private Drawable mDrawable;
 
     private FileOutputStream mFos;
+    private ArrayList<String> files;
 
     private boolean mCanceled;
     private Long mFileLen;
@@ -52,16 +55,17 @@ public class ListFile extends AsyncTask<Void, Long, Boolean> {
     private final static String IMAGE_FILE_NAME = "dbroulette.png";
 
     public ListFile(Context context, DropboxAPI<?> api,
-                                 String dropboxPath, ImageView view) {
+                                 String dropboxPath, ListView view) {
         // We set the context this way so we don't accidentally leak activities
         mContext = context.getApplicationContext();
 
         mApi = api;
         mPath = dropboxPath;
         mView = view;
+        files=new ArrayList<>();
 
         mDialog = new ProgressDialog(context);
-        mDialog.setMessage("Downloading Image");
+        mDialog.setMessage("Get Data List");
         mDialog.setButton(ProgressDialog.BUTTON_POSITIVE, "Cancel", new OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
                 mCanceled = true;
@@ -116,6 +120,12 @@ public class ListFile extends AsyncTask<Void, Long, Boolean> {
                 return false;
             }
 
+            for (int i=0;i<thumbs.size();i++){
+                String name=thumbs.get(i).fileName();
+                //System.out.println(name);
+                files.add(name);
+            }
+//===============================================================================
             // Now pick a random one
             int index = (int) (Math.random() * thumbs.size());
             Entry ent = thumbs.get(index);
@@ -198,8 +208,11 @@ public class ListFile extends AsyncTask<Void, Long, Boolean> {
     protected void onPostExecute(Boolean result) {
         mDialog.dismiss();
         if (result) {
-            // Set the image now that we have it
-            mView.setImageDrawable(mDrawable);
+            System.out.println(files.size());
+            for(String name:files)
+                System.out.println(name);
+            ArrayAdapter<String> listAdapter=new ArrayAdapter<>(mContext,android.R.layout.simple_list_item_1,files);
+            mView.setAdapter(listAdapter);
         } else {
             // Couldn't download it, so show an error
             showToast(mErrorMsg);

@@ -207,7 +207,7 @@ public class DBRoulette extends Activity {
         mShow.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                new ListFile(DBRoulette.this,mApi,PHOTO_DIR,mList).execute();
             }
         });
 
