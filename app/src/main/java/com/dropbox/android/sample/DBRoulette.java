@@ -218,6 +218,8 @@ public class DBRoulette extends Activity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 String select=((TextView) view).getText().toString();
+                String dp_path=PHOTO_DIR+select;
+                new DownloadFile(DBRoulette.this,mApi,dp_path,select,mImage).execute();
                 System.out.println(select);
             }
         });
@@ -303,6 +305,7 @@ public class DBRoulette extends Activity {
             mSubmit.setText("Link with Dropbox");
             mDisplay.setVisibility(View.GONE);
             mImage.setImageDrawable(null);
+            new ListFile(DBRoulette.this,mApi,PHOTO_DIR,mList).execute();
         }
     }
 
