@@ -214,9 +214,6 @@ public class DBRoulette extends Activity {
             }
         });
 
-        String[] test=new String[]{"TEST"};
-        ArrayAdapter<String> AD =new ArrayAdapter<>(this,android.R.layout.simple_list_item_1,test);
-        mList.setAdapter(AD);
         mList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
