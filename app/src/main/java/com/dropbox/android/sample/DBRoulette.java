@@ -305,7 +305,6 @@ public class DBRoulette extends Activity {
             mSubmit.setText("Link with Dropbox");
             mDisplay.setVisibility(View.GONE);
             mImage.setImageDrawable(null);
-            new ListFile(DBRoulette.this,mApi,PHOTO_DIR,mList).execute();
         }
     }
 
