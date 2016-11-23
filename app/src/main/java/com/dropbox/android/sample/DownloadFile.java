@@ -33,7 +33,7 @@ import com.dropbox.client2.exception.DropboxUnlinkedException;
  * control for an app that downloads a file from Dropbox.
  */
 
-public class ListFile extends AsyncTask<Void, Void, Boolean> {
+public class DownloadFile extends AsyncTask<Void, Void, Boolean> {
 
 
     private Context mContext;
@@ -47,8 +47,8 @@ public class ListFile extends AsyncTask<Void, Void, Boolean> {
     private String mErrorMsg;
 
 
-    public ListFile(Context context, DropboxAPI<?> api,
-                                 String dropboxPath, ListView view) {
+    public DownloadFile(Context context, DropboxAPI<?> api,
+                    String dropboxPath, ListView view) {
         // We set the context this way so we don't accidentally leak activities
         mContext = context;
         mApi = api;
