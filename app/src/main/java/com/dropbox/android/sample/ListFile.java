@@ -50,7 +50,13 @@ public class ListFile extends AsyncTask<Void, Void, Boolean> {
     public ListFile(Context context, DropboxAPI<?> api,
                                  String dropboxPath, ListView view) {
         // We set the context this way so we don't accidentally leak activities
-        mContext = context.getApplicationContext();
+        mContext = context;//
+
+
+
+
+
+        // .getApplicationContext();
 
         mApi = api;
         mPath = dropboxPath;
