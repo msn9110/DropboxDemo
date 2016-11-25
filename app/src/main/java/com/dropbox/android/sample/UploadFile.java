@@ -1,26 +1,22 @@
 package com.dropbox.android.sample;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
 
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
-import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
-import android.widget.ArrayAdapter;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import com.dropbox.client2.DropboxAPI;
-import com.dropbox.client2.DropboxAPI.Entry;
-import com.dropbox.client2.DropboxAPI.ThumbFormat;
-import com.dropbox.client2.DropboxAPI.ThumbSize;
+import com.dropbox.client2.DropboxAPI.UploadRequest;
+import com.dropbox.client2.ProgressListener;
 import com.dropbox.client2.exception.DropboxException;
+import com.dropbox.client2.exception.DropboxFileSizeException;
 import com.dropbox.client2.exception.DropboxIOException;
 import com.dropbox.client2.exception.DropboxParseException;
 import com.dropbox.client2.exception.DropboxPartialFileException;
@@ -28,67 +24,89 @@ import com.dropbox.client2.exception.DropboxServerException;
 import com.dropbox.client2.exception.DropboxUnlinkedException;
 
 /**
- * Here we show getting metadata for a directory and downloading a file in a
- * background thread, trying to show typical exception handling and flow of
- * control for an app that downloads a file from Dropbox.
+ * Here we show uploading a file in a background thread, trying to show
+ * typical exception handling and flow of control for an app that uploads a
+ * file from Dropbox.
  */
+public class UploadFile extends AsyncTask<Void, Long, Boolean> {
 
-public class ListFile extends AsyncTask<Void, Void, Boolean> {
-
-
-    private Context mContext;
     private DropboxAPI<?> mApi;
     private String mPath;
-    private ListView mView;
+    private File mFile;
+    private ListView mList;
 
-    private FileOutputStream mFos;
-    private ArrayList<String> files;
+    private long mFileLen;
+    private UploadRequest mRequest;
+    private Context mContext;
+    private final ProgressDialog mDialog;
 
     private String mErrorMsg;
 
 
-    public ListFile(Context context, DropboxAPI<?> api,
-                                 String dropboxPath, ListView view) {
+    public UploadFile(Context context, DropboxAPI<?> api, String dropboxPath,
+                         File file, ListView listView) {
         // We set the context this way so we don't accidentally leak activities
         mContext = context;
+
+        mFileLen = file.length();
         mApi = api;
         mPath = dropboxPath;
-        mView = view;
-        files=new ArrayList<>();
+        mFile = file;
+        mList=listView;
+
+        mDialog = new ProgressDialog(context);
+        mDialog.setMax(100);
+        mDialog.setMessage("Uploading " + file.getName());
+        mDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        mDialog.setProgress(0);
+        mDialog.setButton(ProgressDialog.BUTTON_POSITIVE, "Cancel", new OnClickListener() {
+            public void onClick(DialogInterface dialogInterface, int i) {
+                // This will cancel the putFile operation
+                mRequest.abort();
+            }
+        });
+        mDialog.show();
     }
 
     @Override
     protected Boolean doInBackground(Void... params) {
         try {
-            // Get the metadata for a directory
-            Entry dirent = mApi.metadata(mPath, 1000, null, true, null);
+            // By creating a request, we get a handle to the putFile operation,
+            // so we can cancel it later if we want to
+            FileInputStream fis = new FileInputStream(mFile);
+            String path = mPath + mFile.getName();
+            mRequest = mApi.putFileOverwriteRequest(path, fis, mFile.length(),
+                    new ProgressListener() {
+                        @Override
+                        public long progressInterval() {
+                            // Update the progress bar every half-second or so
+                            return 500;
+                        }
 
-            if (!dirent.isDir || dirent.contents == null) {
-                // It's not a directory, or there's nothing in it
-                mErrorMsg = "File or empty directory";
-                return false;
+                        @Override
+                        public void onProgress(long bytes, long total) {
+                            publishProgress(bytes);
+                        }
+                    });
+
+            if (mRequest != null) {
+                mRequest.upload();
+                return true;
             }
-
-            //===============================================================================
-            for (Entry ent : dirent.contents) {
-                files.add(ent.fileName());
-            }
-            //===============================================================================
-
-
-            return true;
 
         } catch (DropboxUnlinkedException e) {
-            // The AuthSession wasn't properly authenticated or user unlinked.
+            // This session wasn't authenticated properly or user unlinked
+            mErrorMsg = "This app wasn't authenticated properly.";
+        } catch (DropboxFileSizeException e) {
+            // File size too big to upload via the API
+            mErrorMsg = "This file is too big to upload";
         } catch (DropboxPartialFileException e) {
             // We canceled the operation
-            mErrorMsg = "Download canceled";
+            mErrorMsg = "Upload canceled";
         } catch (DropboxServerException e) {
             // Server-side exception.  These are examples of what could happen,
             // but we don't do anything special with them here.
-            if (e.error == DropboxServerException._304_NOT_MODIFIED) {
-                // won't happen since we don't pass in revision with metadata
-            } else if (e.error == DropboxServerException._401_UNAUTHORIZED) {
+            if (e.error == DropboxServerException._401_UNAUTHORIZED) {
                 // Unauthorized, so we should unlink them.  You may want to
                 // automatically log the user out in this case.
             } else if (e.error == DropboxServerException._403_FORBIDDEN) {
@@ -96,10 +114,6 @@ public class ListFile extends AsyncTask<Void, Void, Boolean> {
             } else if (e.error == DropboxServerException._404_NOT_FOUND) {
                 // path not found (or if it was the thumbnail, can't be
                 // thumbnailed)
-            } else if (e.error == DropboxServerException._406_NOT_ACCEPTABLE) {
-                // too many entries to return
-            } else if (e.error == DropboxServerException._415_UNSUPPORTED_MEDIA) {
-                // can't be thumbnailed
             } else if (e.error == DropboxServerException._507_INSUFFICIENT_STORAGE) {
                 // user is over quota
             } else {
@@ -119,23 +133,24 @@ public class ListFile extends AsyncTask<Void, Void, Boolean> {
         } catch (DropboxException e) {
             // Unknown error
             mErrorMsg = "Unknown error.  Try again.";
+        } catch (FileNotFoundException e) {
         }
         return false;
     }
 
     @Override
-    protected void onProgressUpdate(Void... progress) {
-        super.onProgressUpdate(progress);
+    protected void onProgressUpdate(Long... progress) {
+        int percent = (int)(100.0*(double)progress[0]/mFileLen + 0.5);
+        mDialog.setProgress(percent);
     }
 
     @Override
     protected void onPostExecute(Boolean result) {
-        super.onPostExecute(result);
+        mDialog.dismiss();
         if (result) {
-            ArrayAdapter<String> listAdapter=new ArrayAdapter<>(mContext,android.R.layout.simple_list_item_1,files);
-            mView.setAdapter(listAdapter);
+            showToast("File successfully uploaded");
+            new ListFile(mContext,mApi,mPath,mList).execute();
         } else {
-            // Couldn't download it, so show an error
             showToast(mErrorMsg);
         }
     }

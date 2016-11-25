@@ -107,6 +107,7 @@ public class DBRoulette extends Activity {
     private final String PHOTO_DIR = "/Photos/";
 
     private static final int NEW_PICTURE = 1;
+    private static final int CHOOSE_FILE=2;
     private String mCameraFileName;
 
     @Override
@@ -116,7 +117,7 @@ public class DBRoulette extends Activity {
         if (savedInstanceState != null) {
             mCameraFileName = savedInstanceState.getString("mCameraFileName");
         }
-
+/*
         int permission = ActivityCompat.checkSelfPermission(this, WRITE_EXTERNAL_STORAGE);
         if (permission != PackageManager.PERMISSION_GRANTED) {
             // 無權限，向使用者請求
@@ -129,7 +130,7 @@ public class DBRoulette extends Activity {
             //已有權限，執行儲存程式
 
         }
-
+*/
         // We create a new AuthSession so that we can use the Dropbox API.
         AndroidAuthSession session = buildSession();
         mApi = new DropboxAPI<AndroidAuthSession>(session);
@@ -167,30 +168,11 @@ public class DBRoulette extends Activity {
 
         mPhoto.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                Intent intent = new Intent();
-                // Picture from camera
-                intent.setAction(MediaStore.ACTION_IMAGE_CAPTURE);
-
-                // This is not the right way to do this, but for some reason, having
-                // it store it in
-                // MediaStore.Images.Media.EXTERNAL_CONTENT_URI isn't working right.
-
-                Date date = new Date();
-                DateFormat df = new SimpleDateFormat("yyyy-MM-dd-kk-mm-ss", Locale.US);
-
-                String newPicFile = df.format(date) + ".jpg";
-                String outPath = new File(Environment.getExternalStorageDirectory(), newPicFile).getPath();
-                File outFile = new File(outPath);
-
-                mCameraFileName = outFile.toString();
-                Uri outuri = Uri.fromFile(outFile);
-                intent.putExtra(MediaStore.EXTRA_OUTPUT, outuri);
-                Log.i(TAG, "Importing New Picture: " + mCameraFileName);
-                try {
-                    startActivityForResult(intent, NEW_PICTURE);
-                } catch (ActivityNotFoundException e) {
-                    showToast("There doesn't seem to be a camera.");
-                }
+                final String mimeType = "application/x-sqlite3";
+                final Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                intent.setType(mimeType);
+                intent.putExtra(Intent.EXTRA_LOCAL_ONLY,true);
+                startActivityForResult(intent, CHOOSE_FILE);
             }
         });
 
@@ -260,21 +242,26 @@ public class DBRoulette extends Activity {
     // This is what gets called on finishing a media piece to import
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == NEW_PICTURE) {
+        if (requestCode == CHOOSE_FILE) {
             // return from file upload
             if (resultCode == Activity.RESULT_OK) {
                 Uri uri = null;
                 if (data != null) {
                     uri = data.getData();
                 }
-                if (uri == null && mCameraFileName != null) {
-                    uri = Uri.fromFile(new File(mCameraFileName));
-                }
-                File file = new File(mCameraFileName);
+                //if (uri == null && mCameraFileName != null) {
+                //    uri = Uri.fromFile(new File(mCameraFileName));
+                //}
+                //File file = new File(mCameraFileName);
 
                 if (uri != null) {
-                    UploadPicture upload = new UploadPicture(this, mApi, PHOTO_DIR, file);
-                    upload.execute();
+                    //UploadPicture upload = new UploadPicture(this, mApi, PHOTO_DIR, file);
+                    //upload.execute();
+                    String path=uri.getPath();
+                    System.out.println(uri.getLastPathSegment());
+                    if(path.startsWith("/file"))
+                        path=path.replace("/file","");
+                    //new UploadFile(DBRoulette.this,mApi,PHOTO_DIR,new File(path),mList).execute();
                 }
             } else {
                 Log.w(TAG, "Unknown Activity Result from mediaImport: "

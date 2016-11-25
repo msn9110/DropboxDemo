@@ -53,7 +53,7 @@
                 />
             <Button
                 android:id="@+id/photo_button"
-                android:text="New Photo"
+                android:text="UPLOAD FILE"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
                 android:layout_weight="1"
