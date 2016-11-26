@@ -10,6 +10,8 @@
         android:layout_width="fill_parent"
         android:layout_height="75dp"
         />
+
+
     <LinearLayout
         android:id="@+id/logged_in_display"
         android:orientation="vertical"
@@ -17,32 +19,62 @@
         android:layout_height="fill_parent"
         android:layout_weight="1"
         >
-        <ImageView
-            android:id="@+id/image_view"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_weight="1"
-            />
-
-        <ListView
-            android:layout_width="match_parent"
-            android:layout_height="fill_parent"
-            android:id="@+id/listView"
-            android:layout_weight="1" />
 
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:layout_weight="1.5"
-            >
-            <Button
-                android:id="@+id/roulette_button"
-                android:text="Download"
-                android:layout_width="fill_parent"
+            android:layout_weight="1">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="0dp"
                 android:layout_height="fill_parent"
                 android:layout_weight="1"
-                />
+                >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:text="/sdcard/Download/DBDownload"
+                    android:textSize="20sp"/>
+
+                <ListView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/listView_download" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="0dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
+                >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:text="Dropbox:/Photos/"
+                    android:textSize="20sp"/>
+
+                <ListView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/listView_dropbox" />
+
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_weight="6"
+            >
             <Button
                 android:id="@+id/list_button"
                 android:text="List"
@@ -58,5 +90,15 @@
                 android:layout_weight="1"
                 />
         </LinearLayout>
+        <ImageView
+            android:id="@+id/image_view"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_weight="1"
+            android:visibility="gone"
+            />
+
+
+
     </LinearLayout>
 </LinearLayout>

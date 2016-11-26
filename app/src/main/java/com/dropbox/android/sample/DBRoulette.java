@@ -97,26 +97,17 @@ public class DBRoulette extends Activity {
     // Android widgets
     private Button mSubmit;
     private LinearLayout mDisplay;
-    private Button mPhoto;
-    private Button mRoulette;
-    private Button mShow;
 
     private ImageView mImage;
     private ListView mList;
 
     private final String PHOTO_DIR = "/Photos/";
 
-    private static final int NEW_PICTURE = 1;
     private static final int CHOOSE_FILE=2;
-    private String mCameraFileName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        if (savedInstanceState != null) {
-            mCameraFileName = savedInstanceState.getString("mCameraFileName");
-        }
 /*
         int permission = ActivityCompat.checkSelfPermission(this, WRITE_EXTERNAL_STORAGE);
         if (permission != PackageManager.PERMISSION_GRANTED) {
@@ -163,10 +154,10 @@ public class DBRoulette extends Activity {
         // This is where a photo is displayed
         mImage = (ImageView)findViewById(R.id.image_view);
 
-        // This is the button to take a photo
-        mPhoto = (Button)findViewById(R.id.photo_button);
+        // This is the button to upload file
+        Button mUpload = (Button)findViewById(R.id.photo_button);
 
-        mPhoto.setOnClickListener(new OnClickListener() {
+        mUpload.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 final String mimeType = "application/x-sqlite3";
                 final Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
@@ -176,20 +167,9 @@ public class DBRoulette extends Activity {
             }
         });
 
-
-        // This is the button to take a photo
-        mRoulette = (Button)findViewById(R.id.roulette_button);
-
-        mRoulette.setOnClickListener(new OnClickListener() {
-            public void onClick(View v) {
-                DownloadRandomPicture download = new DownloadRandomPicture(DBRoulette.this, mApi, PHOTO_DIR, mImage);
-                download.execute();
-            }
-        });
-
-        mShow=(Button)findViewById(R.id.list_button);
-        mList=(ListView)findViewById(R.id.listView);
-        mShow.setOnClickListener(new OnClickListener() {
+        Button mShowDropboxFile=(Button)findViewById(R.id.list_button);
+        mList=(ListView)findViewById(R.id.listView_dropbox);
+        mShowDropboxFile.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
                 new ListFile(DBRoulette.this,mApi,PHOTO_DIR,mList).execute();
@@ -208,12 +188,6 @@ public class DBRoulette extends Activity {
         // Display the proper UI state if logged in or not
         setLoggedIn(mApi.getSession().isLinked());
 
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        outState.putString("mCameraFileName", mCameraFileName);
-        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -249,23 +223,16 @@ public class DBRoulette extends Activity {
                 if (data != null) {
                     uri = data.getData();
                 }
-                //if (uri == null && mCameraFileName != null) {
-                //    uri = Uri.fromFile(new File(mCameraFileName));
-                //}
-                //File file = new File(mCameraFileName);
 
                 if (uri != null) {
-                    //UploadPicture upload = new UploadPicture(this, mApi, PHOTO_DIR, file);
-                    //upload.execute();
                     String path=uri.getPath();
                     System.out.println(uri.getLastPathSegment());
                     if(path.startsWith("/file"))
                         path=path.replace("/file","");
-                    //new UploadFile(DBRoulette.this,mApi,PHOTO_DIR,new File(path),mList).execute();
+                    new UploadFile(DBRoulette.this,mApi,PHOTO_DIR,new File(path),mList).execute();
                 }
             } else {
-                Log.w(TAG, "Unknown Activity Result from mediaImport: "
-                        + resultCode);
+                Log.w(TAG, "Unknown Activity Result from mediaImport: "+ resultCode);
             }
         }
     }
