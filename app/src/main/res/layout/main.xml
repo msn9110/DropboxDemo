@@ -8,8 +8,7 @@
         android:id="@+id/auth_button"
         android:text="Link with Dropbox"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:layout_weight="8"
+        android:layout_height="75dp"
         />
     <LinearLayout
         android:id="@+id/logged_in_display"
