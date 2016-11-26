@@ -44,28 +44,24 @@ public class DownloadFile extends AsyncTask<Void, Long, Boolean> {
     private DropboxAPI<?> mApi;
     private String mPath;
     private String mFile;
-    private ImageView mView;
-    private Drawable mDrawable;
+    private ListView mDisplayList;
 
     private FileOutputStream mFos;
 
-    boolean type;
     private boolean mCanceled;
     private Long mFileLen;
     private String mErrorMsg;
-
-    // Note that, since we use a single file name here for simplicity, you
-    // won't be able to use this code for two simultaneous downloads.
-    private final static String IMAGE_FILE_NAME = "dbroulette.png";
+    private File mDir;
 
     public DownloadFile(Context context, DropboxAPI<?> api,
-                                 String dropboxPath, String filename, ImageView view) {
+                                 String dropboxDir, File localDir, String filename, ListView DisplayList) {
         // We set the context this way so we don't accidentally leak activities
         mContext = context;
         mFile=filename;
         mApi = api;
-        mPath = dropboxPath;
-        mView = view;
+        mPath = dropboxDir + "/" +filename;
+        mDir = localDir;
+        mDisplayList = DisplayList;
 
         mDialog = new ProgressDialog(context);
         mDialog.setMessage("Download File");
@@ -80,6 +76,7 @@ public class DownloadFile extends AsyncTask<Void, Long, Boolean> {
                     try {
                         mFos.close();
                     } catch (IOException e) {
+                        e.printStackTrace();
                     }
                 }
             }
@@ -91,8 +88,8 @@ public class DownloadFile extends AsyncTask<Void, Long, Boolean> {
     @Override
     protected Boolean doInBackground(Void... params) {
         try {
-            File downloadDir=new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),"DBDownload");
-            downloadDir.mkdirs();
+            if(!mDir.mkdirs())
+                System.out.println("Doesn't Make Dir");
 
             if (mCanceled) {
                 return false;
@@ -105,52 +102,28 @@ public class DownloadFile extends AsyncTask<Void, Long, Boolean> {
             }
 
             mFileLen=fileEnt.bytes;
-            String DownladPath=downloadDir.getAbsolutePath()+"/"+mFile;
+            String DownladPath=mDir.getAbsolutePath()+"/"+mFile;
 
-            if(fileEnt.mimeType.equals("image/jpeg")){
-                type=true;
-                System.out.println("jpg");
-                try {
-                    mFos = new FileOutputStream(DownladPath);
-                } catch (FileNotFoundException e) {
-                    mErrorMsg = "Couldn't create a local file to store the image";
-                    return false;
-                }
-
-                // This downloads a smaller, thumbnail version of the file.  The
-                // API to download the actual file is roughly the same.
-                mApi.getThumbnail(fileEnt.path, mFos, ThumbSize.BESTFIT_960x640,
-                        ThumbFormat.JPEG, null);
-                if (mCanceled) {
-                    return false;
-                }
-
-                mDrawable = Drawable.createFromPath(DownladPath);
-                // We must have a legitimate picture
-                return true;
-            }else {
-                type=false;
-                try {
-                    mFos = new FileOutputStream(DownladPath);
-                } catch (FileNotFoundException e) {
-                    mErrorMsg = "Couldn't create a local file to store the file";
-                    return false;
-                }
-                mApi.getFile(mPath,null,mFos,
-                        new ProgressListener() {
-                            @Override
-                            public long progressInterval() {
-                                // Update the progress bar every half-second or so
-                                return 500;
-                            }
-
-                            @Override
-                            public void onProgress(long bytes, long total) {
-                                publishProgress(bytes);
-                            }
-                        });
-                return true;
+            try {
+                mFos = new FileOutputStream(DownladPath);
+            } catch (FileNotFoundException e) {
+                mErrorMsg = "Couldn't create a local file to store the file";
+                return false;
             }
+            mApi.getFile(mPath,null,mFos,
+                    new ProgressListener() {
+                        @Override
+                        public long progressInterval() {
+                            // Update the progress bar every half-second or so
+                            return 500;
+                        }
+
+                        @Override
+                        public void onProgress(long bytes, long total) {
+                            publishProgress(bytes);
+                        }
+                    });
+            return true;
 
         } catch (DropboxUnlinkedException e) {
             // The AuthSession wasn't properly authenticated or user unlinked.
@@ -158,6 +131,7 @@ public class DownloadFile extends AsyncTask<Void, Long, Boolean> {
             // We canceled the operation
             mErrorMsg = "Download canceled";
         } catch (DropboxServerException e) {
+            /*
             // Server-side exception.  These are examples of what could happen,
             // but we don't do anything special with them here.
             if (e.error == DropboxServerException._304_NOT_MODIFIED) {
@@ -179,6 +153,7 @@ public class DownloadFile extends AsyncTask<Void, Long, Boolean> {
             } else {
                 // Something else
             }
+            */
             // This gets the Dropbox error, translated into the user's language
             mErrorMsg = e.body.userError;
             if (mErrorMsg == null) {
@@ -207,9 +182,7 @@ public class DownloadFile extends AsyncTask<Void, Long, Boolean> {
     protected void onPostExecute(Boolean result) {
         mDialog.dismiss();
         if (result) {
-            if(type)
-                // Set the image now that we have it
-                mView.setImageDrawable(mDrawable);
+            new ListFile(mContext, null, mDir.getPath(), mDisplayList).execute();
         } else {
             // Couldn't download it, so show an error
             showToast(mErrorMsg);

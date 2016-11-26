@@ -97,11 +97,10 @@ public class DBRoulette extends Activity {
     // Android widgets
     private Button mSubmit;
     private LinearLayout mDisplay;
-
-    private ImageView mImage;
-    private ListView mList;
+    private ListView mList, downloadList;
 
     private final String PHOTO_DIR = "/Photos/";
+    private File downloadDir=new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),"DBDownload");
 
     private static final int CHOOSE_FILE=2;
 
@@ -151,9 +150,6 @@ public class DBRoulette extends Activity {
 
         mDisplay = (LinearLayout)findViewById(R.id.logged_in_display);
 
-        // This is where a photo is displayed
-        mImage = (ImageView)findViewById(R.id.image_view);
-
         // This is the button to upload file
         Button mUpload = (Button)findViewById(R.id.photo_button);
 
@@ -176,13 +172,12 @@ public class DBRoulette extends Activity {
             }
         });
 
+        downloadList = (ListView) findViewById(R.id.listView_download);
         mList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 String select=((TextView) view).getText().toString();
-                String dp_path=PHOTO_DIR+select;
-                new DownloadFile(DBRoulette.this,mApi,dp_path,select,mImage).execute();
-                System.out.println(select);
+                new DownloadFile(DBRoulette.this, mApi, PHOTO_DIR, downloadDir, select, downloadList).execute();
             }
         });
         // Display the proper UI state if logged in or not
@@ -255,10 +250,11 @@ public class DBRoulette extends Activity {
         if (loggedIn) {
             mSubmit.setText("Unlink from Dropbox");
             mDisplay.setVisibility(View.VISIBLE);
+            new ListFile(DBRoulette.this, mApi, PHOTO_DIR, mList).execute();
+            new ListFile(DBRoulette.this, null, downloadDir.getPath(), downloadList).execute();
         } else {
             mSubmit.setText("Link with Dropbox");
             mDisplay.setVisibility(View.GONE);
-            mImage.setImageDrawable(null);
         }
     }
 
