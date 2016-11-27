@@ -91,6 +91,7 @@ public class DBRoulette extends Activity {
     private static final int REQUEST_EXTERNAL_STORAGE = 0;
 
     DropboxAPI<AndroidAuthSession> mApi;
+    MyDropboxAPI operations;
 
     private boolean mLoggedIn;
 
@@ -124,11 +125,11 @@ public class DBRoulette extends Activity {
         // We create a new AuthSession so that we can use the Dropbox API.
         AndroidAuthSession session = buildSession();
         mApi = new DropboxAPI<AndroidAuthSession>(session);
+        checkAppKeySetup();
+        operations=new MyDropboxAPI(this,mApi);
 
         // Basic Android widgets
         setContentView(R.layout.main);
-
-        checkAppKeySetup();
 
         mSubmit = (Button)findViewById(R.id.auth_button);
 
@@ -168,7 +169,7 @@ public class DBRoulette extends Activity {
         mShowDropboxFile.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                new ListFile(DBRoulette.this,mApi,PHOTO_DIR,mList).execute();
+                operations.ListRemoteFile(PHOTO_DIR,mList);
             }
         });
 
@@ -177,14 +178,14 @@ public class DBRoulette extends Activity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 String select=((TextView) view).getText().toString();
-                new DownloadFile(DBRoulette.this, mApi, PHOTO_DIR, downloadDir, select, downloadList).execute();
+                operations.DownloadFile(PHOTO_DIR,downloadDir.getAbsolutePath(),select,downloadList);
             }
         });
         // Display the proper UI state if logged in or not
         setLoggedIn(mApi.getSession().isLinked());
 
     }
-
+//============================dropbox api setting=======================================================
     @Override
     protected void onResume() {
         super.onResume();
@@ -204,30 +205,6 @@ public class DBRoulette extends Activity {
             } catch (IllegalStateException e) {
                 showToast("Couldn't authenticate with Dropbox:" + e.getLocalizedMessage());
                 Log.i(TAG, "Error authenticating", e);
-            }
-        }
-    }
-
-    // This is what gets called on finishing a media piece to import
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == CHOOSE_FILE) {
-            // return from file upload
-            if (resultCode == Activity.RESULT_OK) {
-                Uri uri = null;
-                if (data != null) {
-                    uri = data.getData();
-                }
-
-                if (uri != null) {
-                    String path=uri.getPath();
-                    System.out.println(uri.getLastPathSegment());
-                    if(path.startsWith("/file"))
-                        path=path.replace("/file","");
-                    new UploadFile(DBRoulette.this,mApi,PHOTO_DIR,new File(path),mList).execute();
-                }
-            } else {
-                Log.w(TAG, "Unknown Activity Result from mediaImport: "+ resultCode);
             }
         }
     }
@@ -349,6 +326,30 @@ public class DBRoulette extends Activity {
         AndroidAuthSession session = new AndroidAuthSession(appKeyPair);
         loadAuth(session);
         return session;
+    }
+//===================================================================================================
+    // This is what gets called on finishing a media piece to import
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == CHOOSE_FILE) {
+            // return from file upload
+            if (resultCode == Activity.RESULT_OK) {
+                Uri uri = null;
+                if (data != null) {
+                    uri = data.getData();
+                }
+
+                if (uri != null) {
+                    String path=uri.getPath();
+                    System.out.println(uri.getLastPathSegment());
+                    if(path.startsWith("/file"))
+                        path=path.replace("/file","");
+                    operations.UploadFile(PHOTO_DIR,new File(path),mList);
+                }
+            } else {
+                Log.w(TAG, "Unknown Activity Result from mediaImport: "+ resultCode);
+            }
+        }
     }
 
     @Override

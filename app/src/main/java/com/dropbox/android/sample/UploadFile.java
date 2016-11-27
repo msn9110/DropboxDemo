@@ -148,6 +148,8 @@ public class UploadFile extends AsyncTask<Void, Long, Boolean> {
     protected void onPostExecute(Boolean result) {
         mDialog.dismiss();
         if (result) {
+            if(mList==null)
+                return;
             showToast("File successfully uploaded");
             new ListFile(mContext,mApi,mPath,mList).execute();
         } else {
