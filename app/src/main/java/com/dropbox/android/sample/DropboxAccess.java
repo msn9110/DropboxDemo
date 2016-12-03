@@ -9,12 +9,12 @@ import com.dropbox.client2.android.AndroidAuthSession;
 
 import java.io.File;
 
-public class MyDropboxAPI {
+public class DropboxAccess {
 
     private Context mContext;
     DropboxAPI<AndroidAuthSession> mApi;
 
-    public MyDropboxAPI(Context context, DropboxAPI<AndroidAuthSession> api) {
+    public DropboxAccess(Context context, DropboxAPI<AndroidAuthSession> api) {
         mContext = context;
         mApi = api;
     }

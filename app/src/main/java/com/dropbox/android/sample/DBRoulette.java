@@ -75,8 +75,8 @@ public class DBRoulette extends Activity {
     // Note that this is a really insecure way to do this, and you shouldn't
     // ship code which contains your key & secret in such an obvious way.
     // Obfuscation is good.
-    private static final String APP_KEY = "4llmgy33myaizyn";
-    private static final String APP_SECRET = "naoed5xmpmlh55l";
+    private static final String APP_KEY = "4llmgy33myaizyn"; //<<<============replace app key
+    private static final String APP_SECRET = "naoed5xmpmlh55l"; //<<<=============replace app secret
 
     ///////////////////////////////////////////////////////////////////////////
     //                      End app-specific settings.                       //
@@ -91,8 +91,8 @@ public class DBRoulette extends Activity {
     private static final int REQUEST_EXTERNAL_STORAGE = 0;
 
     DropboxAPI<AndroidAuthSession> mApi;
-    MyDropboxAPI operations;
-
+    DropboxAccess operations;
+    ///////////////////////////////////////////////////////////////////////////
     private boolean mLoggedIn;
 
     // Android widgets
@@ -100,15 +100,15 @@ public class DBRoulette extends Activity {
     private LinearLayout mDisplay;
     private ListView mList, downloadList;
 
-    private final String PHOTO_DIR = "/Photos/";
-    private File downloadDir=new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),"DBDownload");
+    private final String MyDropbox_DIR = "/Photos/";//<<<===============dropbox directory
+    private File downloadDir=new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),"DBDownload");//<<<========local directory
 
     private static final int CHOOSE_FILE=2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-/*
+/*//api 23 若target sdk version為api 23不含以下 就不用
         int permission = ActivityCompat.checkSelfPermission(this, WRITE_EXTERNAL_STORAGE);
         if (permission != PackageManager.PERMISSION_GRANTED) {
             // 無權限，向使用者請求
@@ -122,11 +122,13 @@ public class DBRoulette extends Activity {
 
         }
 */
+        //============= 初始化==================================
         // We create a new AuthSession so that we can use the Dropbox API.
         AndroidAuthSession session = buildSession();
         mApi = new DropboxAPI<AndroidAuthSession>(session);
         checkAppKeySetup();
-        operations=new MyDropboxAPI(this,mApi);
+        operations=new DropboxAccess(this,mApi);
+        //======================================================
 
         // Basic Android widgets
         setContentView(R.layout.main);
@@ -169,7 +171,7 @@ public class DBRoulette extends Activity {
         mShowDropboxFile.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                operations.ListRemoteFile(PHOTO_DIR,mList);
+                operations.ListRemoteFile(MyDropbox_DIR,mList);
             }
         });
 
@@ -178,13 +180,14 @@ public class DBRoulette extends Activity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 String select=((TextView) view).getText().toString();
-                operations.DownloadFile(PHOTO_DIR,downloadDir.getAbsolutePath(),select,downloadList);
+                operations.DownloadFile(MyDropbox_DIR,downloadDir.getAbsolutePath(),select,downloadList);
             }
         });
         // Display the proper UI state if logged in or not
-        setLoggedIn(mApi.getSession().isLinked());
+        setLoggedIn(mApi.getSession().isLinked());//,<<<==============================================
 
     }
+    //拷貝開始
 //============================dropbox api setting=======================================================
     @Override
     protected void onResume() {
@@ -227,8 +230,8 @@ public class DBRoulette extends Activity {
         if (loggedIn) {
             mSubmit.setText("Unlink from Dropbox");
             mDisplay.setVisibility(View.VISIBLE);
-            new ListFile(DBRoulette.this, mApi, PHOTO_DIR, mList).execute();
-            new ListFile(DBRoulette.this, null, downloadDir.getPath(), downloadList).execute();
+            operations.ListRemoteFile(MyDropbox_DIR,mList);
+            operations.ListLocalFile(downloadDir.getPath(),downloadList);
         } else {
             mSubmit.setText("Link with Dropbox");
             mDisplay.setVisibility(View.GONE);
@@ -327,8 +330,10 @@ public class DBRoulette extends Activity {
         loadAuth(session);
         return session;
     }
+    //拷貝結束
 //===================================================================================================
     // This is what gets called on finishing a media piece to import
+    //處理選擇檔案上傳
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == CHOOSE_FILE) {
@@ -344,7 +349,7 @@ public class DBRoulette extends Activity {
                     System.out.println(uri.getLastPathSegment());
                     if(path.startsWith("/file"))
                         path=path.replace("/file","");
-                    operations.UploadFile(PHOTO_DIR,new File(path),mList);
+                    operations.UploadFile(MyDropbox_DIR,new File(path),mList);
                 }
             } else {
                 Log.w(TAG, "Unknown Activity Result from mediaImport: "+ resultCode);
@@ -352,6 +357,7 @@ public class DBRoulette extends Activity {
         }
     }
 
+    //api 23 permission
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         switch(requestCode) {
