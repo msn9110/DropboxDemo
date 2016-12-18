@@ -25,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String APP_KEY = "4llmgy33myaizyn"; //<<<============replace app key
     private static final String APP_SECRET = "naoed5xmpmlh55l"; //<<<=============replace app secret
-    private static final String fileExt = ".txt";
+    private static final String fileExt = ".txt";//<<<===========副檔名 null or * 為全部
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

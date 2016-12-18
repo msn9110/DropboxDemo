@@ -155,8 +155,8 @@ public class DropboxView extends Fragment {
         mDisplay = (LinearLayout) mContentView.findViewById(R.id.logged_in_display);
 
         // This is the button to upload file
-        Button mUpload = (Button) mContentView.findViewById(R.id.photo_button);
-
+        //==========================button upload==================================
+        Button mUpload = (Button) mContentView.findViewById(R.id.upload_button);
         mUpload.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 final String mimeType = "application/x-sqlite3";
@@ -166,17 +166,19 @@ public class DropboxView extends Fragment {
                 startActivityForResult(intent, CHOOSE_FILE);
             }
         });
+        //=======================================================================
 
-        Button mShowDropboxFile=(Button) mContentView.findViewById(R.id.list_button);
         dropboxList = (ListView) mContentView.findViewById(R.id.listView_dropbox);
-        mShowDropboxFile.setOnClickListener(new View.OnClickListener() {
+        downloadList = (ListView) mContentView.findViewById(R.id.listView_download);
+
+        Button mListFile=(Button) mContentView.findViewById(R.id.list_button);
+        mListFile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 operations.ListRemoteFile(MyDropbox_DIR, dropboxList, fileExt);
+                operations.ListLocalFile(downloadDir.getAbsolutePath(), downloadList, fileExt);
             }
         });
-
-        downloadList = (ListView) mContentView.findViewById(R.id.listView_download);
         dropboxList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
