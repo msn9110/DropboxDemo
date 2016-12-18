@@ -29,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.main);
 
         if (Build.VERSION.SDK_INT >= 23){
@@ -41,24 +42,22 @@ public class MainActivity extends AppCompatActivity {
                         REQUEST_EXTERNAL_STORAGE);
             }else{
                 //已有權限，執行儲存程式
-
-                //加载Fragment
-                FragmentManager fragmentManager = getFragmentManager();
-                FragmentTransaction transaction = fragmentManager.beginTransaction();
-                DropboxView dropboxView = DropboxView.newInstance(APP_KEY, APP_SECRET, MyDropbox_DIR, downloadDir.getAbsolutePath());
-                transaction.add(R.id.frag_dropbox_view, dropboxView);
-                transaction.commit();
+                setFragment();
             }
         } else {
             //已有權限，執行儲存程式
-            //加载Fragment
-            FragmentManager fragmentManager = getFragmentManager();
-            FragmentTransaction transaction = fragmentManager.beginTransaction();
-            DropboxView dropboxView = DropboxView.newInstance(APP_KEY, APP_SECRET, MyDropbox_DIR, downloadDir.getAbsolutePath());
-            transaction.add(R.id.frag_dropbox_view, dropboxView);
-            transaction.commit();
+            setFragment();
         }
 
+    }
+
+    private void setFragment(){
+        //加载Fragment
+        FragmentManager fragmentManager = getFragmentManager();
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        DropboxView dropboxView = DropboxView.newInstance(APP_KEY, APP_SECRET, MyDropbox_DIR, downloadDir.getAbsolutePath());
+        transaction.add(R.id.myView, dropboxView);
+        transaction.commit();
     }
 
     //api 23 permission
@@ -69,12 +68,7 @@ public class MainActivity extends AppCompatActivity {
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     //取得權限，進行檔案存取
-                    //加载Fragment
-                    FragmentManager fragmentManager = getFragmentManager();
-                    FragmentTransaction transaction = fragmentManager.beginTransaction();
-                    DropboxView dropboxView = DropboxView.newInstance(APP_KEY, APP_SECRET, MyDropbox_DIR, downloadDir.getAbsolutePath());
-                    transaction.add(R.id.frag_dropbox_view, dropboxView);
-                    transaction.commit();
+                    setFragment();
                 } else {
                     //使用者拒絕權限，停用檔案存取功能
                     this.finish();

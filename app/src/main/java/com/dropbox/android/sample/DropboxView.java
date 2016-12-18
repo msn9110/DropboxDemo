@@ -79,7 +79,7 @@ public class DropboxView extends Fragment {
         Bundle bundle = new Bundle();
         bundle.putString("APP_KEY", appKey);
         bundle.putString("APP_SECRET", appSecret);
-        bundle.putString("MyDropbox_Dir", dropboxDir);
+        bundle.putString("MyDropboxDir", dropboxDir);
         bundle.putString("localDir",localPath);
         newFragment.setArguments(bundle);
         return newFragment;
@@ -90,6 +90,7 @@ public class DropboxView extends Fragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         this.context = context;
+        //this.context = getActivity().getApplicationContext();
     }
 
     @Override
@@ -107,7 +108,7 @@ public class DropboxView extends Fragment {
         if (args != null) {
             APP_KEY = args.getString("APP_KEY");
             APP_SECRET = args.getString("APP_SECRET");
-            MyDropbox_DIR = args.getString("MyDropbox_DIR");
+            MyDropbox_DIR = args.getString("MyDropboxDir");
             String localDir = args.getString("localDir");
             if (localDir != null)
                 downloadDir = new File(localDir);

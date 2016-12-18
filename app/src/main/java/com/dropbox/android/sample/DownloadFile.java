@@ -82,7 +82,7 @@ public class DownloadFile extends AsyncTask<Void, Long, Boolean> {
             }
         });
 
-//        mDialog.show();
+        mDialog.show();
     }
 
     @Override
