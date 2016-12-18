@@ -19,20 +19,20 @@ public class DropboxAccess {
         mApi = api;
     }
 
-    public void DownloadFile(String remoteDir, String localDir, String filename, ListView displayList){
+    public void DownloadFile(String remoteDir, String localDir, String filename, ListView displayList, String ext){
         File targetDir = new File(localDir);
-        new DownloadFile(mContext,mApi,remoteDir,targetDir,filename,displayList).execute();
+        new DownloadFile(mContext, mApi, remoteDir, targetDir, filename, displayList, ext).execute();
     }
 
-    public void UploadFile(String remoteDir,File file,ListView displayList){
-        new UploadFile(mContext,mApi,remoteDir,file,displayList).execute();
+    public void UploadFile(String remoteDir, File file, ListView displayList, String ext){
+        new UploadFile(mContext, mApi, remoteDir, file, displayList, ext).execute();
     }
 
-    public void ListLocalFile(String path,ListView displayList){
-        new ListFile(mContext,null,path,displayList).execute();
+    public void ListLocalFile(String path, ListView displayList, String ext){
+        new ListFile(mContext, null, path, displayList, ext).execute();
     }
 
-    public void ListRemoteFile(String path,ListView displayList){
-        new ListFile(mContext,mApi,path,displayList).execute();
+    public void ListRemoteFile(String path, ListView displayList, String ext){
+        new ListFile(mContext, mApi, path, displayList, ext).execute();
     }
 }

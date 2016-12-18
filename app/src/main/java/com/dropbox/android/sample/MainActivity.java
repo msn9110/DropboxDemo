@@ -25,6 +25,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String APP_KEY = "4llmgy33myaizyn"; //<<<============replace app key
     private static final String APP_SECRET = "naoed5xmpmlh55l"; //<<<=============replace app secret
+    private static final String fileExt = "*";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +56,8 @@ public class MainActivity extends AppCompatActivity {
         //加载Fragment
         FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction transaction = fragmentManager.beginTransaction();
-        DropboxView dropboxView = DropboxView.newInstance(APP_KEY, APP_SECRET, MyDropbox_DIR, downloadDir.getAbsolutePath());
+        DropboxView dropboxView = DropboxView.newInstance(APP_KEY, APP_SECRET,
+                                        MyDropbox_DIR, downloadDir.getAbsolutePath(), fileExt);
         transaction.add(R.id.myView, dropboxView);
         transaction.commit();
     }

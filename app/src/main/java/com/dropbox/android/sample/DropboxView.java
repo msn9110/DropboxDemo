@@ -44,11 +44,11 @@ public class DropboxView extends Fragment {
     // Note that this is a really insecure way to do this, and you shouldn't
     // ship code which contains your key & secret in such an obvious way.
     // Obfuscation is good.
-    private String MyDropbox_DIR = "/Backup/";//<<<===============dropbox directory
-    private File downloadDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),"DBDownload");//<<<========local directory
-
-    private static String APP_KEY = "4llmgy33myaizyn"; //<<<============replace app key
-    private static String APP_SECRET = "naoed5xmpmlh55l"; //<<<=============replace app secret
+    private String MyDropbox_DIR;
+    private File downloadDir;
+    private String fileExt;
+    private static String APP_KEY;
+    private static String APP_SECRET;
 
     ///////////////////////////////////////////////////////////////////////////
     //                      End app-specific settings.                       //
@@ -74,13 +74,14 @@ public class DropboxView extends Fragment {
     private static final int CHOOSE_FILE = 2;
 
     public static DropboxView newInstance(String appKey, String appSecret, String dropboxDir,
-                                          String localPath) {
+                                          String localPath, String ext) {
         DropboxView newFragment = new DropboxView();
         Bundle bundle = new Bundle();
         bundle.putString("APP_KEY", appKey);
         bundle.putString("APP_SECRET", appSecret);
         bundle.putString("MyDropboxDir", dropboxDir);
-        bundle.putString("localDir",localPath);
+        bundle.putString("localDir", localPath);
+        bundle.putString("fileExt", ext);
         newFragment.setArguments(bundle);
         return newFragment;
 
@@ -109,6 +110,7 @@ public class DropboxView extends Fragment {
             APP_KEY = args.getString("APP_KEY");
             APP_SECRET = args.getString("APP_SECRET");
             MyDropbox_DIR = args.getString("MyDropboxDir");
+            fileExt = args.getString("fileExt");
             String localDir = args.getString("localDir");
             if (localDir != null)
                 downloadDir = new File(localDir);
@@ -170,7 +172,7 @@ public class DropboxView extends Fragment {
         mShowDropboxFile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                operations.ListRemoteFile(MyDropbox_DIR, dropboxList);
+                operations.ListRemoteFile(MyDropbox_DIR, dropboxList, fileExt);
             }
         });
 
@@ -179,7 +181,7 @@ public class DropboxView extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 String select=((TextView) view).getText().toString();
-                operations.DownloadFile(MyDropbox_DIR,downloadDir.getAbsolutePath(),select,downloadList);
+                operations.DownloadFile(MyDropbox_DIR,downloadDir.getAbsolutePath(),select,downloadList, fileExt);
             }
         });
         // Display the proper UI state if logged in or not
@@ -268,8 +270,8 @@ public class DropboxView extends Fragment {
         if (loggedIn) {
             buttonText = "Unlink from Dropbox";
             mDisplay.setVisibility(View.VISIBLE);
-            operations.ListRemoteFile(MyDropbox_DIR, dropboxList);
-            operations.ListLocalFile(downloadDir.getPath(), downloadList);
+            operations.ListRemoteFile(MyDropbox_DIR, dropboxList, fileExt);
+            operations.ListLocalFile(downloadDir.getPath(), downloadList, fileExt);
         } else {
             buttonText = "Link with Dropbox";
             mDisplay.setVisibility(View.GONE);
@@ -385,7 +387,7 @@ public class DropboxView extends Fragment {
                     System.out.println(uri.getLastPathSegment());
                     if(path.startsWith("/file"))
                         path=path.replace("/file","");
-                    operations.UploadFile(MyDropbox_DIR,new File(path),dropboxList);
+                    operations.UploadFile(MyDropbox_DIR,new File(path),dropboxList, fileExt);
                 }
             } else {
                 Log.w(TAG, "Unknown Activity Result from mediaImport: "+ resultCode);

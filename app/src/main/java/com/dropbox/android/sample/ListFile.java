@@ -36,15 +36,16 @@ public class ListFile extends AsyncTask<Void, Void, Boolean> {
     private ArrayList<String> files;
 
     private String mErrorMsg;
-
+    private String mExt;
 
     public ListFile(Context context, DropboxAPI<?> api,
-                                 String Path, ListView view) {
+                                 String Path, ListView view, String ext) {
         // We set the context this way so we don't accidentally leak activities
         mContext = context;
         mApi = api;
         mPath = Path;
         mList = view;
+        mExt = ext;
         files = new ArrayList<>();
     }
 
@@ -63,7 +64,13 @@ public class ListFile extends AsyncTask<Void, Void, Boolean> {
 
                 //===============================================================================
                 for (Entry ent : dirent.contents) {
-                    files.add(ent.fileName());
+                    String filename = ent.fileName();
+                    if (filename.endsWith(mExt)){
+                        files.add(filename);
+                    } else if(mExt == null || mExt.equalsIgnoreCase("*")){
+                        files.add(filename);
+                    }
+
                 }
                 //===============================================================================
 
@@ -98,8 +105,14 @@ public class ListFile extends AsyncTask<Void, Void, Boolean> {
                 return false;
             File[] myfiles = dir.listFiles();
             for (File f : myfiles){
-                if (f.isFile())
-                    files.add(f.getName());
+                if (f.isFile()){
+                    String filename = f.getName();
+                    if (filename.endsWith(mExt)){
+                        files.add(filename);
+                    } else if(mExt == null || mExt.equalsIgnoreCase("*")){
+                        files.add(filename);
+                    }
+                }
             }
 
             return (files.size() > 0);

@@ -41,10 +41,11 @@ public class UploadFile extends AsyncTask<Void, Long, Boolean> {
     private final ProgressDialog mDialog;
 
     private String mErrorMsg;
+    private String mExt;
 
 
     public UploadFile(Context context, DropboxAPI<?> api, String dropboxPath,
-                         File file, ListView listView) {
+                         File file, ListView listView, String ext) {
         // We set the context this way so we don't accidentally leak activities
         mContext = context;
 
@@ -53,6 +54,7 @@ public class UploadFile extends AsyncTask<Void, Long, Boolean> {
         mPath = dropboxPath;
         mFile = file;
         dropboxList = listView;
+        mExt = ext;
 
         mDialog = new ProgressDialog(context);
         mDialog.setMax(100);
@@ -151,7 +153,7 @@ public class UploadFile extends AsyncTask<Void, Long, Boolean> {
             if(dropboxList == null)
                 return;
             showToast("File successfully uploaded");
-            new ListFile(mContext,mApi,mPath,dropboxList).execute();
+            new ListFile(mContext, mApi, mPath, dropboxList, mExt).execute();
         } else {
             showToast(mErrorMsg);
         }

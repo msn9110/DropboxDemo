@@ -52,16 +52,17 @@ public class DownloadFile extends AsyncTask<Void, Long, Boolean> {
     private Long mFileLen;
     private String mErrorMsg;
     private File mDir;
-
+    private String mExt;
     public DownloadFile(Context context, DropboxAPI<?> api,
-                                 String dropboxDir, File localDir, String filename, ListView DisplayList) {
+                                 String dropboxDir, File localDir, String filename, ListView DisplayList, String ext) {
         // We set the context this way so we don't accidentally leak activities
         mContext = context;
-        mFile=filename;
+        mFile = filename;
         mApi = api;
         mPath = dropboxDir + "/" +filename;
         mDir = localDir;
         mDisplayList = DisplayList;
+        mExt = ext;
 
         mDialog = new ProgressDialog(context);
         mDialog.setMessage("Download File");
@@ -184,7 +185,7 @@ public class DownloadFile extends AsyncTask<Void, Long, Boolean> {
         if (result) {
             if(mDisplayList==null)
                 return;
-            new ListFile(mContext, null, mDir.getPath(), mDisplayList).execute();
+            new ListFile(mContext, null, mDir.getPath(), mDisplayList, mExt).execute();
         } else {
             // Couldn't download it, so show an error
             showToast(mErrorMsg);
