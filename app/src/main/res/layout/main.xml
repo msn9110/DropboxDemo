@@ -1,94 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    >
-    <Button
-        android:id="@+id/auth_button"
-        android:text="Link with Dropbox"
-        android:layout_width="fill_parent"
-        android:layout_height="75dp"
-        />
-
+    android:layout_height="fill_parent" >
 
     <LinearLayout
-        android:id="@+id/logged_in_display"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:orientation="vertical"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:layout_weight="1"
-        >
+        android:layout_margin="20dp"
+        android:id="@+id/myView">
+        <fragment
+            android:id="@+id/frag_dropbox_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:name="com.dropbox.android.sample.DropboxView" />
 
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_weight="1">
-
-            <LinearLayout
-                android:orientation="vertical"
-                android:layout_width="0dp"
-                android:layout_height="fill_parent"
-                android:layout_weight="1"
-                >
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:text="/sdcard/Download/DBDownload"
-                    android:textSize="20sp"/>
-
-                <ListView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/listView_download" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:orientation="vertical"
-                android:layout_width="0dp"
-                android:layout_height="fill_parent"
-                android:layout_weight="1"
-                >
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:text="Dropbox:/Photos/"
-                    android:textSize="20sp"/>
-
-                <ListView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/listView_dropbox" />
-
-            </LinearLayout>
-        </LinearLayout>
-
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_weight="6"
-            >
-            <Button
-                android:id="@+id/list_button"
-                android:text="List"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:layout_weight="1"
-                />
-            <Button
-                android:id="@+id/photo_button"
-                android:text="UPLOAD FILE"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:layout_weight="1"
-                />
-        </LinearLayout>
     </LinearLayout>
+
+
 </LinearLayout>

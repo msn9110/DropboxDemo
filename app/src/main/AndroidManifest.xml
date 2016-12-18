@@ -13,7 +13,7 @@
         android:theme="@style/AppTheme">
 
         <activity
-            android:name=".DBRoulette"
+            android:name=".MainActivity"
             android:label="@string/app_name"
             android:configChanges="orientation|keyboard">
             <intent-filter>

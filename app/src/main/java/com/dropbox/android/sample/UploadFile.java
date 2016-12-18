@@ -65,7 +65,7 @@ public class UploadFile extends AsyncTask<Void, Long, Boolean> {
                 mRequest.abort();
             }
         });
-        mDialog.show();
+//        mDialog.show();
     }
 
     @Override
