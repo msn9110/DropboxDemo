@@ -181,7 +181,15 @@ public class DropboxView extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 String select=((TextView) view).getText().toString();
-                operations.DownloadFile(MyDropbox_DIR,downloadDir.getAbsolutePath(),select,downloadList, fileExt);
+                operations.DownloadFile(MyDropbox_DIR, downloadDir.getAbsolutePath(), select, downloadList, fileExt);
+            }
+        });
+        downloadList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                String select=((TextView) view).getText().toString();
+                File file = new File(downloadDir, select);
+                operations.UploadFile(MyDropbox_DIR, file, dropboxList, fileExt);
             }
         });
         // Display the proper UI state if logged in or not
