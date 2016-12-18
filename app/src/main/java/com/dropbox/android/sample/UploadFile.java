@@ -33,7 +33,7 @@ public class UploadFile extends AsyncTask<Void, Long, Boolean> {
     private DropboxAPI<?> mApi;
     private String mPath;
     private File mFile;
-    private ListView mList;
+    private ListView dropboxList;
 
     private long mFileLen;
     private UploadRequest mRequest;
@@ -52,7 +52,7 @@ public class UploadFile extends AsyncTask<Void, Long, Boolean> {
         mApi = api;
         mPath = dropboxPath;
         mFile = file;
-        mList=listView;
+        dropboxList = listView;
 
         mDialog = new ProgressDialog(context);
         mDialog.setMax(100);
@@ -148,10 +148,10 @@ public class UploadFile extends AsyncTask<Void, Long, Boolean> {
     protected void onPostExecute(Boolean result) {
         mDialog.dismiss();
         if (result) {
-            if(mList==null)
+            if(dropboxList == null)
                 return;
             showToast("File successfully uploaded");
-            new ListFile(mContext,mApi,mPath,mList).execute();
+            new ListFile(mContext,mApi,mPath,dropboxList).execute();
         } else {
             showToast(mErrorMsg);
         }

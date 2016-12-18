@@ -69,7 +69,7 @@ public class DropboxView extends Fragment {
     // Android widgets
     private Button mSubmit;
     private LinearLayout mDisplay;
-    private ListView mList, downloadList;
+    private ListView dropboxList, downloadList;
 
     private static final int CHOOSE_FILE = 2;
 
@@ -166,16 +166,16 @@ public class DropboxView extends Fragment {
         });
 
         Button mShowDropboxFile=(Button) mContentView.findViewById(R.id.list_button);
-        mList = (ListView) mContentView.findViewById(R.id.listView_dropbox);
+        dropboxList = (ListView) mContentView.findViewById(R.id.listView_dropbox);
         mShowDropboxFile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                operations.ListRemoteFile(MyDropbox_DIR, mList);
+                operations.ListRemoteFile(MyDropbox_DIR, dropboxList);
             }
         });
 
         downloadList = (ListView) mContentView.findViewById(R.id.listView_download);
-        mList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        dropboxList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 String select=((TextView) view).getText().toString();
@@ -268,7 +268,7 @@ public class DropboxView extends Fragment {
         if (loggedIn) {
             buttonText = "Unlink from Dropbox";
             mDisplay.setVisibility(View.VISIBLE);
-            operations.ListRemoteFile(MyDropbox_DIR, mList);
+            operations.ListRemoteFile(MyDropbox_DIR, dropboxList);
             operations.ListLocalFile(downloadDir.getPath(), downloadList);
         } else {
             buttonText = "Link with Dropbox";
@@ -282,7 +282,7 @@ public class DropboxView extends Fragment {
         // Check to make sure that we have a valid app key
         if (APP_KEY.startsWith("CHANGE") ||
                 APP_SECRET.startsWith("CHANGE")) {
-            showToast("You must apply for an app key and secret from developers.dropbox.com, and add them to the DBRoulette ap before trying it.");
+            showToast("You must apply for an app key and secret from developers.dropbox.com, and add them to the DropboxView ap before trying it.");
             return;
         }
 
@@ -385,7 +385,7 @@ public class DropboxView extends Fragment {
                     System.out.println(uri.getLastPathSegment());
                     if(path.startsWith("/file"))
                         path=path.replace("/file","");
-                    operations.UploadFile(MyDropbox_DIR,new File(path),mList);
+                    operations.UploadFile(MyDropbox_DIR,new File(path),dropboxList);
                 }
             } else {
                 Log.w(TAG, "Unknown Activity Result from mediaImport: "+ resultCode);
