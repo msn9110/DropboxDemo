@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
-
+//
     private void setFragment(){
         downloadDir.mkdirs();
         //加载Fragment
